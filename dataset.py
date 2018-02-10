@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 import re
 import sys
 from os import listdir
-import numpy
+import numpy as np
 from os.path import isfile, join
 from trained_model import google_model, get_word_vector
 
@@ -283,12 +283,12 @@ def makeDataSet():
 def getFeatureVector(speech):
 	# Google Word2Vec
     words = speech.split()
-    google_vector = numpy.zeros(300, dtype='float64')
+    google_vector = np.zeros(300, dtype='float64')
     for word in words:
         google_vector += get_word_vector(word)
     print "Google Vector: ", len(google_vector)
     vector = google_vector
-    if numpy.all(vector == 0): return None
+    if np.all(vector == 0): return None
     return vector
 
 def makeFeatures():
