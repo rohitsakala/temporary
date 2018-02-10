@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import re
 from os import listdir
+import numpy
 from os.path import isfile, join
 from trained_model import google_model, get_word_vector
 
