@@ -288,7 +288,7 @@ def getFeatureVector(speech):
         google_vector += get_word_vector(word)
     print "Google Vector: ", len(google_vector)
     vector = google_vector
-    if numpy.all(ans == 0): return None
+    if numpy.all(vector == 0): return None
     return vector
 
 def makeFeatures():
@@ -298,16 +298,15 @@ def makeFeatures():
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			getFeatureVector(text)
-			vector = get_total_vector(splittedtext)
-			if np.all(ans == 0):
+			vector = getFeatureVector(text)
+			if np.all(vector == 0):
 				pass
 			else:
 				if count < (countCallForAction*(float(8)/10)):
-					X_train.append(ans)
+					X_train.append(vector)
 					y_train.append(0)
 				else:
-					X_test.append(ans)
+					X_test.append(vector)
 					y_test.append(0)
 				count = count + 1
 
@@ -316,16 +315,15 @@ def makeFeatures():
 	for fi in DefectFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			getFeatureVector(text)
-			vector = get_total_vector(splittedtext)
-			if np.all(ans == 0):
+			vector = getFeatureVector(text)
+			if np.all(vector == 0):
 				pass
 			else:
 				if count < (countDefect*(float(8)/10)):
-					X_train.append(ans)
+					X_train.append(vector)
 					y_train.append(1)
 				else:
-					X_test.append(ans)
+					X_test.append(vector)
 					y_test.append(1)
 				count = count + 1
 
@@ -334,16 +332,15 @@ def makeFeatures():
 	for fi in AllegationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			getFeatureVector(text)
-			ans = get_total_vector(splittedtext)
-			if np.all(ans == 0):
+			vector = getFeatureVector(text)
+			if np.all(vector == 0):
 				pass
 			else:
 				if count < (countAllegation*(float(8)/10)):
-					X_train.append(ans)
+					X_train.append(vector)
 					y_train.append(2)
 				else:
-					X_test.append(ans)
+					X_test.append(vector)
 					y_test.append(2)
 				count = count + 1
 
@@ -352,16 +349,15 @@ def makeFeatures():
 	for fi in AppreciationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			getFeatureVector(text)
-			ans = get_total_vector(splittedtext)
-			if np.all(ans == 0):
+			vector = getFeatureVector(text)
+			if np.all(vector == 0):
 				pass
 			else:
 				if count < (countAppreciation*(float(8)/10)):
-					X_train.append(ans)
+					X_train.append(vector)
 					y_train.append(3)
 				else:
-					X_test.append(ans)
+					X_test.append(vector)
 					y_test.append(3)
 				count = count + 1
 
@@ -370,7 +366,7 @@ def makeFeatures():
 	print len(X_test)
 	print len(y_test)
 
-	X_train = np.array(X_train)
+	X_train = np.array(X_train)speech
 	y_train = np.array(y_train)
 	X_test = np.array(X_test)
 	y_test = np.array(y_test)
