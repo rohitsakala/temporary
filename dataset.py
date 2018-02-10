@@ -8,6 +8,7 @@ from os import listdir
 import numpy as np
 import pickle
 from os.path import isfile, join
+from sklearn import svm
 from trained_model import google_model, get_word_vector
 
 
