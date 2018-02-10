@@ -22,6 +22,11 @@ countCallForAction = 0
 MONGO_HOST = "10.2.32.86"
 MONGO_PORT = 27017
 
+X_train = []
+y_train = []
+X_test = []
+y_test = []
+
 def cleanSentences(string):
     string = string.lower()
     return re.sub(strip_special_chars, "", string.lower())
