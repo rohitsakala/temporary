@@ -297,6 +297,10 @@ def getFeatureVector(speech):
     return vector
 
 def makeFeatures():
+	global X_train
+	global X_test
+	global y_train
+	global y_test
 	# CallforAction : 0, Defect : 1, Allegation : 2, Appreciation : 3
 	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
 	count = 0
