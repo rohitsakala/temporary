@@ -3,6 +3,7 @@ import json
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import re
+import sys
 from os import listdir
 import numpy
 from os.path import isfile, join
@@ -286,136 +287,88 @@ def getFeatureVector(speech):
     for word in words:
         google_vector += get_word_vector(word)
     print "Google Vector: ", len(google_vector)
-    ans = google_vector
-    print ans
-    sys.exit(0)
+    vector = google_vector
     if numpy.all(ans == 0): return None
-    return ans
+    return vector
 
 def makeFeatures():
 	# CallforAction : 0, Defect : 1, Allegation : 2, Appreciation : 3
 	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
+	count = 0
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
 			getFeatureVector(text)
+			vector = get_total_vector(splittedtext)
+			if np.all(ans == 0):
+				pass
+			else:
+				if count < (countCallForAction*(float(8)/10)):
+					X_train.append(ans)
+					y_train.append(0)
+				else:
+					X_test.append(ans)
+					y_test.append(0)
+				count = count + 1
 
-'''ans = get_total_vector(splittedtext)
-            if np.all(ans == 0):
-                countChu = countChu + 1
-            else:
-                if count < (countCallForAction*(float(8)/10)):
-                    X_train.append(ans)
-                    y_train.append(0)
-                else:
-                    X_test.append(ans)
-                    y_test.append(0)
-                count = count + 1
+	count = 0
+	DefectFiles = ['defect/' + f for f in listdir('defect/') if isfile(join('defect/', f))]
+	for fi in DefectFiles:
+		with open(fi, "r") as f:
+			text=f.read()
+			getFeatureVector(text)
+			vector = get_total_vector(splittedtext)
+			if np.all(ans == 0):
+				pass
+			else:
+				if count < (countDefect*(float(8)/10)):
+					X_train.append(ans)
+					y_train.append(1)
+				else:
+					X_test.append(ans)
+					y_test.append(1)
+				count = count + 1
 
+	count = 0
+	AllegationFiles = ['allegation/' + f for f in listdir('allegation/') if isfile(join('allegation/', f))]
+	for fi in AllegationFiles:
+		with open(fi, "r") as f:
+			text=f.read()
+			getFeatureVector(text)
+			ans = get_total_vector(splittedtext)
+			if np.all(ans == 0):
+				pass
+			else:
+				if count < (countAllegation*(float(8)/10)):
+					X_train.append(ans)
+					y_train.append(2)
+				else:
+					X_test.append(ans)
+					y_test.append(2)
+				count = count + 1
 
-print len(X_train)
-print len(y_train)
-print len(X_test)
-print len(y_test)
+	count = 0
+	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/') if isfile(join('appreciation/', f))]
+	for fi in AppreciationFiles:
+		with open(fi, "r") as f:
+			text=f.read()
+			getFeatureVector(text)
+			ans = get_total_vector(splittedtext)
+			if np.all(ans == 0):
+				pass
+			else:
+				if count < (countAppreciation*(float(8)/10)):
+					X_train.append(ans)
+					y_train.append(3)
+				else:
+					X_test.append(ans)
+					y_test.append(3)
+				count = count + 1
 
-count = 0
-print "Defect Training Data Processing"
-DefectFiles = ['defect/' + f for f in listdir('defect/') if isfile(join('defect/', f))]
-for fi in DefectFiles:
-        with open(fi, "r") as f:
-            text=f.read()
-            splittedtext = text.split()
-            ans = get_total_vector(splittedtext)
-            if np.all(ans == 0):
-                countChu = countChu + 1
-            else:
-                if count < (countDefect*(float(8)/10)):
-                    X_train.append(ans)
-                    y_train.append(1)
-                else:
-                    X_test.append(ans)
-                    y_test.append(1)
-                count = count + 1
-
-print len(X_train)
-print len(y_train)
-print len(X_test)
-print len(y_test)
-
-count = 0
-print "Allegation Training Data Processing"
-AllegationFiles = ['allegation/' + f for f in listdir('allegation/') if isfile(join('allegation/', f))]
-for fi in AllegationFiles:
-        with open(fi, "r") as f:
-            text=f.read()
-            splittedtext = text.split()
-            ans = get_total_vector(splittedtext)
-            if np.all(ans == 0):
-                countChu = countChu + 1
-            else:
-                if count < (countAllegation*(float(8)/10)):
-                    X_train.append(ans)
-                    y_train.append(2)
-                else:
-                    X_test.append(ans)
-                    y_test.append(2)
-                count = count + 1
-
-print len(X_train)
-print len(y_train)
-print len(X_test)
-print len(y_test)
-
-count = 0
-print "Appreciation Training Data Processing"
-AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/') if isfile(join('appreciation/', f))]
-for fi in AppreciationFiles:
-        with open(fi, "r") as f:
-            text=f.read()
-            splittedtext = text.split()
-            ans = get_total_vector(splittedtext)
-            if np.all(ans == 0):
-                countChu = countChu + 1
-            else:
-                if count < (countAppreciation*(float(8)/10)):
-                    X_train.append(ans)
-                    y_train.append(3)
-                else:
-                    X_test.append(ans)
-                    y_test.append(3)
-                count = count + 1
-
-print len(X_train)
-print len(y_train)
-print len(X_test)
-print len(y_test)
-
-print countChu
-
-	# Discourse Connectives
-	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
-	for fi in CallforActionFiles:
-        with open(fi, "r") as f:
-            text=f.read()
-            splittedtext = text.split()
-            ans = get_total_vector(splittedtext)
-            if np.all(ans == 0):
-                countChu = countChu + 1
-            else:
-                if count < (countCallForAction*(float(8)/10)):
-                    X_train.append(ans)
-                    y_train.append(0)
-                else:
-                    X_test.append(ans)
-                    y_test.append(0)
-                count = count + 1
-
-
-print len(X_train)
-print len(y_train)
-print len(X_test)
-print len(y_test)
-	pass'''
+	print len(X_train)
+	print len(y_train)
+	print len(X_test)
+	print len(y_test)
 
 if __name__ == "__main__":
 	makeDataSet()
