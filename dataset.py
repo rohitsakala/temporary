@@ -292,7 +292,6 @@ def getFeatureVector(speech):
     google_vector = np.zeros(300, dtype='float64')
     for word in words:
         google_vector += get_word_vector(word)
-    print "Google Vector: ", len(google_vector)
     vector = google_vector
     if np.all(vector == 0): return None
     return vector
@@ -398,6 +397,47 @@ def makeFeatures():
 	with open("y_test.p", "wb") as f:
 		pickle.dump(y_test, f)
 
+def makeModels():
+	global X_train
+	global X_test
+	global y_train
+	global y_test
+	with open("X_train.p", "rb") as f:
+		X_train = pickle.load(f)
+
+	with open("y_train.p", "rb") as f:
+		y_train = pickle.load(f)
+
+	with open("X_test.p", "rb") as f:
+		X_test = pickle.load(f)
+
+	with open("y_test.p", "rb") as f:
+		y_test = pickle.load(f)
+
+	X = np.append(X_train, X_test, axis=0) 
+	y = np.append(y_train, y_test)
+
+	print X.shape
+	print y.shape
+
+	svmModel = svm.LinearSVC()
+	svmModel.fit(X, Y)
+	with open("svmModel.p", "wb") as f:
+		pickle.dump(svmModel, f)
+
+def makeResults():
+	global X_train
+	global X_test
+	global y_train
+	global y_test
+	svmModel = None
+	with open("svmModel.p", "rb") as f:
+		svmModel = pickle.load(f)
+	predicted = svmModel.predict(X_test)
+	print accuracy_score(y_test, predicted)
+
 if __name__ == "__main__":
-	makeDataSet()
-	makeFeatures()
+	#makeDataSet()
+	#makeFeatures()
+	makeModels()
+	makeResults()
