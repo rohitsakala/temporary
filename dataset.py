@@ -366,7 +366,7 @@ def makeFeatures():
 	print len(X_test)
 	print len(y_test)
 
-	X_train = np.array(X_train)speech
+	X_train = np.array(X_train)
 	y_train = np.array(y_train)
 	X_test = np.array(X_test)
 	y_test = np.array(y_test)
