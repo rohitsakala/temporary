@@ -422,7 +422,7 @@ def makeModels():
 	print y.shape
 
 	svmModel = svm.LinearSVC()
-	svmModel.fit(X, Y)
+	svmModel.fit(X, y)
 	with open("svmModel.p", "wb") as f:
 		pickle.dump(svmModel, f)
 
