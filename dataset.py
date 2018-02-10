@@ -424,7 +424,7 @@ def makeModels():
 	print y.shape
 
 	svmModel = OneVsRestClassifier(svm.LinearSVC())
-	svmModel.fit(X, y)
+	svmModel.fit(X_train, y_train)
 	with open("svmModel.p", "wb") as f:
 		pickle.dump(svmModel, f)
 
