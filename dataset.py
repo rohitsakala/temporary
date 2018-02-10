@@ -296,7 +296,7 @@ def getFeatureVector(speech):
         google_vector += get_word_vector(word)
     vector = google_vector
     if np.all(vector == 0): return None
-    return vector
+    # 
 
 def makeFeatures():
 	global X_train
@@ -422,7 +422,7 @@ def makeModels():
 	print X.shape
 	print y.shape
 
-	svmModel = svm.LinearSVC()
+	svmModel = OneVsRestClassifier(svm.LinearSVC())
 	svmModel.fit(X, y)
 	with open("svmModel.p", "wb") as f:
 		pickle.dump(svmModel, f)
