@@ -370,6 +370,28 @@ def makeFeatures():
 	print len(X_test)
 	print len(y_test)
 
+	X_train = np.array(X_train)
+	y_train = np.array(y_train)
+	X_test = np.array(X_test)
+	y_test = np.array(y_test)
+
+	print X_train.shape
+	print y_train.shape
+	print X_test.shape
+	print y_test.shape
+
+	with open("X_train.p", "wb") as f:
+		pickle.dump(X_train, f)
+
+	with open("y_train.p", "wb") as f:
+		pickle.dump(y_train, f)
+
+	with open("X_test.p", "wb") as f:
+		pickle.dump(X_test, f)
+
+	with open("y_test.p", "wb") as f:
+		pickle.dump(y_test, f)
+
 if __name__ == "__main__":
 	makeDataSet()
 	makeFeatures()
