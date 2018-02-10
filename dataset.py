@@ -10,6 +10,7 @@ import pickle
 from os.path import isfile, join
 from sklearn import svm
 from sklearn.metrics import accuracy_score
+from sklearn.multiclass import OneVsRestClassifier
 #from trained_model import google_model, get_word_vector
 
 
