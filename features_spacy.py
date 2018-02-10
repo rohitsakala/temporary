@@ -82,14 +82,12 @@ def get_vector(sentence):
     if numpy.all(ans == 0): return None
     return ans
 
-def getVector(sentence):
+def getVector(speech):
+    words = speech.split()
     google_vector = numpy.zeros(300, dtype='float64')
-    for sent in sentence:
-        #print sent
-        google_vector += get_word_vector(sent)
-    #print "Google Vector: ", len(google_vector)
-    #print "Classes Vector: ", len(classes_vector)
-    #print "Return Vector: ", len(return_vector)
+    for word in words:
+        google_vector += get_word_vector(word)
+    print "Google Vector: ", len(google_vector)
     ans = google_vector
     if numpy.all(ans == 0): return None
     return ans
