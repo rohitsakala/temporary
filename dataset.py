@@ -451,7 +451,7 @@ def makeResults():
 	print precision_recall_fscore_support(y_test, predicted)
 
 if __name__ == "__main__":
-	#makeDataSet()
+	makeDataSet()
 	makeFeatures()
 	makeModels()
 	makeResults()
