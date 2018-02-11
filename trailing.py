@@ -72,7 +72,7 @@ def makeData():
 	return w2v
 
 def makeDataPre():
-	with open("glove.6B.50d.txt", "rb") as lines:
+	with open("glove.6B.300d.txt", "rb") as lines:
 		w2v = {line.split()[0]: np.array(map(float, line.split()[1:]))
 			for line in lines}
 	return w2v
