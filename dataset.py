@@ -11,9 +11,10 @@ from os.path import isfile, join
 from sklearn import svm
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support 
 from sklearn.multiclass import OneVsRestClassifier
-from trained_model import google_model, get_word_vector
+#from trained_model import google_model, get_word_vector
 from nltk.corpus import opinion_lexicon
-
+from os import listdir
+from os.path import isfile, join
 
 strip_special_chars = re.compile("[^A-Za-z0-9 ]+")
 countFor = 0
@@ -293,7 +294,7 @@ def makeDataSet():
 def getFeatureVector(speech):
 	# Google Word2Vec
 	speech = re.sub(' +',' ',speech)
-	words = speech.split()
+	'''words = speech.split()
 	google_vector = np.zeros(300, dtype='float64')
 	for word in words:
 		google_vector += get_word_vector(word)
@@ -307,17 +308,35 @@ def getFeatureVector(speech):
 			discourse_vector[index] = 1
 		else:
 			discourse_vector[index] = 0
-	final_vector = np.append(google_vector, discourse_vector, axis=0)
-	return final_vector
+	#final_vector = np.append(google_vector, discourse_vector, axis=0)
+	#return final_vector
 
-	# Opinion Lexicons
-	print opinion_lexicon.words()
-	sys.exit(0)
+	# Opinion Lexicons Count
+	opinion_vector = np.zeros(1, dtype='float64')
+	words = speech.split()
+	countPositive = 0
+	countNegative = 0
+	for word in words:
+		if word in opinion_lexicon.positive():
+			countPositive = countPositive + 1
+		elif word in opinion_lexicon.negative():
+			countNegative = countNegative + 1
+	if countPositive > countNegative:
+		opinion_vector[0] = 1
+	elif countPositive < countNegative:
+		opinion_vector[0] = -1
+	else:
+		opinion_vector[0] = 0
+	print opinion_vector
+	return opinion_vector'''
 
 	# Verbs
 
+	# doc2vec
+	
 
-	# doc2vec try
+
+
 
 def makeFeatures():
 	global X_train
