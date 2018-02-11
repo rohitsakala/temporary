@@ -308,7 +308,11 @@ def getFeatureVector(speech):
 			discourse_vector[index] = 1
 		else:
 			discourse_vector[index] = 0
-	return discourse_vector
+	final_vector = np.append(google_vector, discourse_vector, axis=0)
+	print google_vector.shape
+	print discourse_vector.shape
+	print final_vector.shape
+	return final_vector
 	# doc2vec try
 
 def makeFeatures():
