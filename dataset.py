@@ -308,11 +308,8 @@ def getFeatureVector(speech):
 			discourse_vector[index] = 1
 		else:
 			discourse_vector[index] = 0
-	print discourse_vector
-	sys.exit(0)
+	return discourse_vector
 	# doc2vec try
-
-	sys.exit(0)
 
 def makeFeatures():
 	global X_train
