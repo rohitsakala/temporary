@@ -439,7 +439,7 @@ def makeResults():
 
 if __name__ == "__main__":
 	#makeDataSet()
-	#makeFeatures()
+	makeFeatures()
 	makeModels()
 	makeResults()
 	#temp()
