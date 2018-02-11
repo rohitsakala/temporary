@@ -292,14 +292,12 @@ def makeDataSet():
 def getFeatureVector(speech):
 	# Google Word2Vec
 	speech = re.sub(' +',' ',speech)
-
-	'''words = speech.split()
+	words = speech.split()
 	google_vector = np.zeros(300, dtype='float64')
 	for word in words:
 		google_vector += get_word_vector(word)
-	vector = google_vector
-	if np.all(vector == 0): return None'''
-
+	if np.all(vector == 0): return None
+	
 	# Discourse Connectives
 	discourseConnectives = ['above all', 'accordingly', 'actually', 'admittedly','after', 'after', 'after all', 'after that', 'afterwards', 'again', 'all in all', 'all the same', 'also', 'alternatively', 'although', 'always assuming that', 'and', 'or', 'anyway', 'as', 'as a consequence', 'as a corollary', 'as a result', 'as long as', 'as soon as', 'as well', 'at any rate', 'at first', 'at first sight', 'at first blush', 'at first view', 'at the moment when', 'at the outset', 'at the same time', 'because', 'before', 'but', 'by comparison', 'by contrast', 'by the same token', 'by the way', 'certainly', 'clearly', 'consequently', 'conversely', 'correspondingly', 'despite that', 'despite the fact that', 'earlier', 'either', 'else', 'equally', 'essentially then', 'even', 'even so', 'even then', 'eventually', 'every time', 'except', 'except insofar', 'finally', 'first', 'first of all', 'firstly', 'for', 'for a start', 'for example', 'for instance', 'for one thing', 'for the simple reason', 'for this reason', 'further', 'furthermore','further', 'given that', 'hence', 'however', 'if', 'if ever', 'if not', 'if only', 'if so', 'in a different vein', 'in actual fact','in addition', 'in any case', 'in case', 'in conclusion', 'in contrast','in fact', 'initially', 'in other words', 'in particular', 'in short', 'in spite of that', 'in sum', 'in that case', 'in the beginning', 'in the case of X','in the end','in the first place','in the meantime','in this way', 'in turn', 'in as much as','incidentally','indeed','instead','it follows that','it might appear that','it might seem that', 'just as','last', 'lastly','later','let us assume','likewise','meanwhile', 'merely','merely because','moreXly','moreover','mostly','much later','much sooner','naturally','neither is it the same','nevertheless','next','no doubt','nonetheless','not','not because','not only','not that','notably','notwithstanding that','notwithstanding that','now','now that','obviously','of course','on condition that','one one hand','on one side','on the assumption that','on the contrary','on the grounds that', 'on the one hand','on the one side','on the other hand','on the other side','once','once again','once more','or','or else','otherwise','overall','plainly','presumbly because','previously','provided that','providing that','put another way','rather','reciprocally','regardless of that','simply because','secondly','still','so that','since','similarly','simultaneously','so','specifically','still','subsequently','summarising','suppose','supposing that','surely','sure enough','such that','summing up','surely','that is','that is to say','the fact is that','the more often','then','thereafter','then again','therefore','thirdly','this time','thereby','this time','thus','though','to be sure','to conclude','to sum up','to start with','to begin with','thus','to the degree that','too','ultimetly','unless','we might say','when','wherein','while','yet','whenever','wheras','what is more','until','undoubtedly','true']
 	discourse_vector = np.zeros(len(discourseConnectives), dtype='float64')
