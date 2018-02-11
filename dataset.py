@@ -484,6 +484,20 @@ def makeResults():
 	scores = cross_validation(X, y, svmModel, cv=5)
 	pretty_print_scores(scores)
 
+def cross_validation(data, target, classifier, cv=5):
+    """
+    Does a cross validation with the classifier
+    parameters:
+        - `data`: array-like, shape=[n_samples, n_features]
+            Training vectors
+        - `target`: array-like, shape=[n_samples]
+            Target values for corresponding training vectors
+        - `classifier`: A classifier from the scikit-learn family would work!
+        - `cv`: number of times to do the cross validation. (default=5)
+    return a list of numbers, where the length of the list is equal to `cv` argument.
+    """
+    return sklearn.cross_validation.cross_val_score(classifier, data, target, cv=cv)
+
 
 def pretty_print_scores(scores):
     """
