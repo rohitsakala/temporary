@@ -12,6 +12,7 @@ from sklearn import svm
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support 
 from sklearn.multiclass import OneVsRestClassifier
 from trained_model import google_model, get_word_vector
+from nltk.corpus import opinion_lexicon
 
 
 strip_special_chars = re.compile("[^A-Za-z0-9 ]+")
@@ -307,10 +308,15 @@ def getFeatureVector(speech):
 		else:
 			discourse_vector[index] = 0
 	final_vector = np.append(google_vector, discourse_vector, axis=0)
-	print google_vector.shape
-	print discourse_vector.shape
-	print final_vector.shape
 	return final_vector
+
+	# Opinion Lexicons
+	print opinion_lexicon.words()
+	sys.exit(0)
+
+	# Verbs
+
+
 	# doc2vec try
 
 def makeFeatures():
