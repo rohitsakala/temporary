@@ -292,6 +292,7 @@ def makeDataSet():
 def getFeatureVector(speech):
 	# Google Word2Vec
 	speech = re.sub(' +',' ',speech)
+
     '''words = speech.split()
     google_vector = np.zeros(300, dtype='float64')
     for word in words:
