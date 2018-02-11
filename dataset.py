@@ -390,6 +390,11 @@ def makeFeatures():
 	X_test = np.array(X_test)
 	y_test = np.array(y_test)
 
+	print X_train.shape
+	print y_train.shape
+	print X_test.shape
+	print y_test.shape
+
 	with open("X_train.p", "wb") as f:
 		pickle.dump(X_train, f)
 
