@@ -362,10 +362,10 @@ def makeFeatures():
 			else:
 				if count < (countCallForAction*(float(8)/10)):
 					X_train.append(vector)
-					y_train.append(0)
+					y_train.append(1)
 				else:
 					X_test.append(vector)
-					y_test.append(0)
+					y_test.append(1)
 				count = count + 1
 
 	count = 0
@@ -379,10 +379,10 @@ def makeFeatures():
 			else:
 				if count < (countDefect*(float(8)/10)):
 					X_train.append(vector)
-					y_train.append(1)
+					y_train.append(0)
 				else:
 					X_test.append(vector)
-					y_test.append(1)
+					y_test.append(0)
 				count = count + 1
 
 	count = 0
