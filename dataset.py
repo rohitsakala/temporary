@@ -11,7 +11,7 @@ from os.path import isfile, join
 from sklearn import svm
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support 
 from sklearn.multiclass import OneVsRestClassifier
-#from trained_model import google_model, get_word_vector
+from trained_model import google_model, get_word_vector
 from nltk.corpus import opinion_lexicon
 from os import listdir
 from os.path import isfile, join
