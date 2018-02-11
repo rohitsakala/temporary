@@ -396,10 +396,10 @@ def makeFeatures():
 			else:
 				if count < (countAllegation*(float(8)/10)):
 					X_train.append(vector)
-					y_train.append(2)
+					y_train.append(1)
 				else:
 					X_test.append(vector)
-					y_test.append(2)
+					y_test.append(1)
 				count = count + 1
 
 	count = 0
@@ -413,10 +413,10 @@ def makeFeatures():
 			else:
 				if count < (countAppreciation*(float(8)/10)):
 					X_train.append(vector)
-					y_train.append(3)
+					y_train.append(1)
 				else:
 					X_test.append(vector)
-					y_test.append(3)
+					y_test.append(1)
 				count = count + 1
 
 	X_train = np.array(X_train)
