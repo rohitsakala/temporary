@@ -371,6 +371,7 @@ def getFeatureVector(speech):
 			exclude = set(string.punctuation)
 			wor = ''.join(ch for ch in wor if ch not in exclude)
 			try:
+				print wor
 				w2vTrainedVector =  w2vTrained[wor]
 			except:
 				return np.zeros(100, dtype='float64')
@@ -640,6 +641,7 @@ def trainWord2Vec():
 
 if __name__ == "__main__":
 	makeDataSet()
+	global w2vTrained
 	w2vTrained = trainWord2Vec()
 	makeFeatures()
 	makeModels()
