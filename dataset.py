@@ -583,6 +583,7 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
+					print wor
 					wor = wor.translate(string.maketrans("", ""), string.punctuation)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
