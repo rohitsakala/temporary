@@ -579,8 +579,10 @@ def trainWord2Vec():
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
+			print text
 			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
 			for sent in sentenceList:
+				print sent
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
@@ -636,7 +638,6 @@ def trainWord2Vec():
 	model.save('word2vec')
 	words = list(model.wv.vocab)
 	return model
-
 
 if __name__ == "__main__":
 	global w2vTrained
