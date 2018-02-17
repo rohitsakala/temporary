@@ -22,6 +22,8 @@ import gensim, logging
 from termcolor import colored
 from colorama import init
 from nltk.tokenize import sent_tokenize,word_tokenize
+from gensim.parsing import PorterStemmer
+global_stemmer = PorterStemmer()
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 strip_special_chars = re.compile("[^A-Za-z0-9 ]+")
@@ -42,6 +44,48 @@ X_test = []
 y_test = []
 X= []
 y = []
+
+class StemmingHelper(object):
+    """
+    Class to aid the stemming process - from word to stemmed form,
+    and vice versa.
+    The 'original' form of a stemmed word will be returned as the
+    form in which its been used the most number of times in the text.
+    """
+ 
+    #This reverse lookup will remember the original forms of the stemmed
+    #words
+    word_lookup = {}
+ 
+    @classmethod
+    def stem(cls, word):
+        """
+        Stems a word and updates the reverse lookup.
+        """
+ 
+        #Stem the word
+        stemmed = global_stemmer.stem(word)
+ 
+        #Update the word lookup
+        if stemmed not in cls.word_lookup:
+            cls.word_lookup[stemmed] = {}
+        cls.word_lookup[stemmed][word] = (
+            cls.word_lookup[stemmed].get(word, 0) + 1)
+ 
+        return stemmed
+ 
+    @classmethod
+    def original_form(cls, word):
+        """
+        Returns original form of a word given the stemmed version,
+        as stored in the word lookup.
+        """
+ 
+        if word in cls.word_lookup:
+            return max(cls.word_lookup[word].keys(),
+                       key=lambda x: cls.word_lookup[word][x])
+        else:
+            return word
 
 def cleanSentences(string):
     string = string.lower()
@@ -522,7 +566,10 @@ def trainWord2Vec():
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				wordsList = word_tokenize(sent)
-				words.append(wordsList)
+				newWordsList = []
+				for wor in wordsList:
+					newWordsList.append(StemmingHelper.stem(wor))
+				words.append(newWordsList)
 
 	DefectFiles = ['defect/' + f for f in listdir('defect/') if isfile(join('defect/', f))]
 	for fi in DefectFiles:
@@ -531,7 +578,10 @@ def trainWord2Vec():
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				wordsList = word_tokenize(sent)
-				words.append(wordsList)
+				newWordsList = []
+				for wor in wordsList:
+					newWordsList.append(StemmingHelper.stem(wor))
+				words.append(newWordsList)
 
 	AllegationFiles = ['allegation/' + f for f in listdir('allegation/') if isfile(join('allegation/', f))]
 	for fi in AllegationFiles:
@@ -540,7 +590,10 @@ def trainWord2Vec():
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				wordsList = word_tokenize(sent)
-				words.append(wordsList)
+				newWordsList = []
+				for wor in wordsList:
+					newWordsList.append(StemmingHelper.stem(wor))
+				words.append(newWordsList)
 
 	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/') if isfile(join('appreciation/', f))]
 	for fi in AppreciationFiles:
@@ -549,13 +602,15 @@ def trainWord2Vec():
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				wordsList = word_tokenize(sent)
-				words.append(wordsList)
+				newWordsList = []
+				for wor in wordsList:
+					newWordsList.append(StemmingHelper.stem(wor))
+				words.append(newWordsList)
 
 	print len(words)
 	model = gensim.models.Word2Vec(words, min_count=1, workers=12)
 	model.save('word2vec')
-	words = list(model.wv.vocab)
-	print words
+	return model
 
 
 if __name__ == "__main__":
