@@ -368,9 +368,9 @@ def getFeatureVector(speech):
 		for wor in wordsList:
 			wor = wor.translate(string.maketrans("", ""), string.punctuation)
 			try:
-        		w2vTrainedVector =  w2vTrained[wor]
-    		except:
-        		return numpy.zeros(300, dtype='float64')
+				w2vTrainedVector =  w2vTrained[wor]
+			except:
+				return numpy.zeros(300, dtype='float64')
     print w2vTrainedVector
     return w2vTrainedVector
 
