@@ -374,6 +374,7 @@ def getFeatureVector(speech):
 				numpy.add(w2vTrainedVector,w2vTrained[wor])
 				print w2vTrainedVector
 				print w2vTrainedVector.shape
+				print w2vTrained[wor].shape
 				print w2vTrainedVector
 			except:
 				return np.zeros(100, dtype='float64')
