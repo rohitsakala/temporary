@@ -551,8 +551,8 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				words.append(wordsList)
 
-	print len(sentences)
-	model = gensim.models.Word2Vec(sentences, min_count=1, workers=12)
+	print len(words)
+	model = gensim.models.Word2Vec(words, min_count=1, workers=12)
 	model.save('word2vec')
 	words = list(model.wv.vocab)
 	print words
