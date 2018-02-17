@@ -366,6 +366,7 @@ def getFeatureVector(speech):
 	for sent in sentenceList:
 		wordsList = word_tokenize(sent)
 		for wor in wordsList:
+			print wor
 			wor = wor.translate(string.maketrans("", ""), string.punctuation)
 			try:
 				w2vTrainedVector =  w2vTrained[wor]
