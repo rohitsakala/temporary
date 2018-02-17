@@ -519,7 +519,7 @@ def trainWord2Vec():
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			sentenceList = sent_tokenize(text)
+			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				sentences.append(sent)
 
@@ -527,7 +527,7 @@ def trainWord2Vec():
 	for fi in DefectFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			sentenceList = sent_tokenize(text)
+			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				sentences.append(sent)
 
@@ -535,7 +535,7 @@ def trainWord2Vec():
 	for fi in AllegationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			sentenceList = sent_tokenize(text)
+			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
 				sentences.append(sent)
 
@@ -543,7 +543,8 @@ def trainWord2Vec():
 	for fi in AppreciationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			sentenceList = sent_tokenize(text)
+			sentenceList = sent_tokenize(text.decode('utf-8').strip())
+			print sentenceList
 			for sent in sentenceList:
 				sentences.append(sent)
 
