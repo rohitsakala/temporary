@@ -641,6 +641,6 @@ def trainWord2Vec():
 if __name__ == "__main__":
 	makeDataSet()
 	w2vTrained = trainWord2Vec()
-	#makeFeatures()
-	#makeModels()
-	#makeResults()
+	makeFeatures()
+	makeModels()
+	makeResults()
