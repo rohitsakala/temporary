@@ -579,6 +579,8 @@ def trainWord2Vec():
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
+			print "cscs"
+			print text
 			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
 			for sent in sentenceList:
 				print sent
