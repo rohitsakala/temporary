@@ -368,8 +368,8 @@ def getFeatureVector(speech):
 	for sent in sentenceList:
 		wordsList = word_tokenize(sent)
 		for wor in wordsList:
-			print wor
-			wor = wor.translate(string.maketrans("", ""), string.punctuation)
+			exclude = set(string.punctuation)
+			wor = ''.join(ch for ch in wor if ch not in exclude)
 			try:
 				w2vTrainedVector =  w2vTrained[wor]
 			except:
@@ -585,8 +585,8 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					print wor
-					wor = wor.translate(string.maketrans("", ""), string.punctuation)
+					exclude = set(string.punctuation)
+					wor = ''.join(ch for ch in wor if ch not in exclude)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
@@ -599,7 +599,8 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					wor = wor.translate(string.maketrans("", ""), string.punctuation)
+					exclude = set(string.punctuation)
+					wor = ''.join(ch for ch in wor if ch not in exclude)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
@@ -612,7 +613,8 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					wor = wor.translate(string.maketrans("", ""), string.punctuation)
+					exclude = set(string.punctuation)
+					wor = ''.join(ch for ch in wor if ch not in exclude)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
@@ -625,7 +627,8 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					wor = wor.translate(string.maketrans("", ""), string.punctuation)
+					exclude = set(string.punctuation)
+					wor = ''.join(ch for ch in wor if ch not in exclude)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
