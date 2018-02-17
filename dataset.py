@@ -552,13 +552,14 @@ def trainWord2Vec():
 	print len(sentences)
 	model = gensim.models.Word2Vec(sentences, min_count=1, workers=12)
 	model.save('word2vec')
+	words = list(model.wv.vocab)
+	print(model['word'])
 
 
 if __name__ == "__main__":
-	trainWord2Vec()
+	w2vpre = trainWord2Vec()
 	#makeDataSet()
 	#makeFeatures()
 	#makeModels()
 	#makeResults()
-	#temp()
 
