@@ -20,7 +20,7 @@ from os import listdir
 from os.path import isfile, join
 import sklearn.cross_validation
 import gensim, logging
-import string
+from string import *
 from termcolor import colored
 from colorama import init
 from nltk.tokenize import sent_tokenize,word_tokenize
