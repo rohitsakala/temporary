@@ -1,7 +1,5 @@
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 import os
 import json
 from pymongo import MongoClient
