@@ -575,17 +575,12 @@ def pretty_print_scores(scores):
 
 def trainWord2Vec():
 	words = []
-	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
-	print CallforActionFiles
+	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/')]
 	for fi in CallforActionFiles:
-		print fi
 		with open(fi, "r") as f:
 			text=f.read()
-			print "cscs"
-			print text
 			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
 			for sent in sentenceList:
-				print sent
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
@@ -594,7 +589,7 @@ def trainWord2Vec():
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
-	DefectFiles = ['defect/' + f for f in listdir('defect/') if isfile(join('defect/', f))]
+	DefectFiles = ['defect/' + f for f in listdir('defect/')]
 	for fi in DefectFiles:
 		with open(fi, "r") as f:
 			text=f.read()
@@ -603,12 +598,11 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					print wor
 					wor = wor.translate(string.maketrans("", ""), string.punctuation)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
-	AllegationFiles = ['allegation/' + f for f in listdir('allegation/') if isfile(join('allegation/', f))]
+	AllegationFiles = ['allegation/' + f for f in listdir('allegation/')]
 	for fi in AllegationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
@@ -617,12 +611,11 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					print wor
 					wor = wor.translate(string.maketrans("", ""), string.punctuation)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
-	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/') if isfile(join('appreciation/', f))]
+	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/')]
 	for fi in AppreciationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
@@ -631,7 +624,6 @@ def trainWord2Vec():
 				wordsList = word_tokenize(sent)
 				newWordsList = []
 				for wor in wordsList:
-					print wor
 					wor = wor.translate(string.maketrans("", ""), string.punctuation)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
@@ -644,7 +636,6 @@ def trainWord2Vec():
 
 if __name__ == "__main__":
 	makeDataSet()
-	global w2vTrained
 	w2vTrained = trainWord2Vec()
 	#makeFeatures()
 	#makeModels()
