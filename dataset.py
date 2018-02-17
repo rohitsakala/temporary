@@ -363,7 +363,7 @@ def getFeatureVector(speech):
 	# Word2Vec trained
 
 	global w2vTrained
-	w2vTrainedVector = np.zeros(300, dtype='float64') 
+	w2vTrainedVector = np.zeros(100, dtype='float64') 
 	sentenceList = sent_tokenize(speech.decode('utf-8').strip().lower())
 	for sent in sentenceList:
 		wordsList = word_tokenize(sent)
@@ -373,7 +373,7 @@ def getFeatureVector(speech):
 			try:
 				w2vTrainedVector =  w2vTrained[wor]
 			except:
-				return np.zeros(300, dtype='float64')
+				return np.zeros(100, dtype='float64')
 	print w2vTrainedVector
 	return w2vTrainedVector
 	'''
@@ -633,7 +633,7 @@ def trainWord2Vec():
 				words.append(newWordsList)
 
 	print len(words)
-	model = gensim.models.Word2Vec(words, min_count=2,window = 5, workers=12)
+	model = gensim.models.Word2Vec(words, min_count=2,window = 5, workers=12,size=100)
 	model.save('word2vec')
 	words = list(model.wv.vocab)
 	return model
