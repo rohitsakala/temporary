@@ -585,7 +585,7 @@ def trainWord2Vec():
 				newWordsList = []
 				for wor in wordsList:
 					print wor
-					wor = wor.translate(string.maketrans("", "", string.punctuation))
+					wor = wor.translate(string.maketrans("", ""), string.punctuation)
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
