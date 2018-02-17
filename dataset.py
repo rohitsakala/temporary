@@ -21,7 +21,7 @@ import sklearn.cross_validation
 import gensim, logging
 from termcolor import colored
 from colorama import init
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize,word_tokenize
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 strip_special_chars = re.compile("[^A-Za-z0-9 ]+")
@@ -514,15 +514,15 @@ def pretty_print_scores(scores):
     print colored("                                      ", 'white', 'on_white')
 
 def trainWord2Vec():
-	sentences = []
+	words = []
 	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			print text
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
-				sentences.append(sent)
+				wordsList = word_tokenize(sent)
+				words.append(wordsList)
 
 	DefectFiles = ['defect/' + f for f in listdir('defect/') if isfile(join('defect/', f))]
 	for fi in DefectFiles:
@@ -530,7 +530,8 @@ def trainWord2Vec():
 			text=f.read()
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
-				sentences.append(sent)
+				wordsList = word_tokenize(sent)
+				words.append(wordsList)
 
 	AllegationFiles = ['allegation/' + f for f in listdir('allegation/') if isfile(join('allegation/', f))]
 	for fi in AllegationFiles:
@@ -538,16 +539,17 @@ def trainWord2Vec():
 			text=f.read()
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
 			for sent in sentenceList:
-				sentences.append(sent)
+				wordsList = word_tokenize(sent)
+				words.append(wordsList)
 
 	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/') if isfile(join('appreciation/', f))]
 	for fi in AppreciationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
 			sentenceList = sent_tokenize(text.decode('utf-8').strip())
-			print sentenceList
 			for sent in sentenceList:
-				sentences.append(sent)
+				wordsList = word_tokenize(sent)
+				words.append(wordsList)
 
 	print len(sentences)
 	model = gensim.models.Word2Vec(sentences, min_count=1, workers=12)
