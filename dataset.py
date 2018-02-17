@@ -575,9 +575,10 @@ def pretty_print_scores(scores):
 
 def trainWord2Vec():
 	words = []
-	print "ceihfbvuevbufvu"
 	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/') if isfile(join('callforaction/', f))]
+	print CallforActionFiles
 	for fi in CallforActionFiles:
+		print fi
 		with open(fi, "r") as f:
 			text=f.read()
 			print "cscs"
