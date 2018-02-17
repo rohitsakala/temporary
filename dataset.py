@@ -643,9 +643,9 @@ def trainWord2Vec():
 	return model
 
 if __name__ == "__main__":
+	makeDataSet()
 	global w2vTrained
 	w2vTrained = trainWord2Vec()
-	#makeDataSet()
 	#makeFeatures()
 	#makeModels()
 	#makeResults()
