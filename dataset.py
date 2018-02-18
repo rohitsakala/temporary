@@ -7,6 +7,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import re
 import sys
+import os.path
 from os import listdir
 import numpy as np
 import pickle
@@ -14,8 +15,9 @@ from os.path import isfile, join
 from sklearn import svm
 from sklearn.metrics import accuracy_score,precision_recall_fscore_support 
 from sklearn.multiclass import OneVsRestClassifier
-#from trained_model import google_model, get_word_vector
+from trained_model import google_model, get_word_vector
 from nltk.corpus import opinion_lexicon
+from sklearn.model_selection import cross_val_score
 from os import listdir
 from os.path import isfile, join
 import sklearn.cross_validation
@@ -23,7 +25,7 @@ import gensim, logging
 from string import maketrans,translate
 import string
 from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score, confusion_matrix
 from termcolor import colored
 from colorama import init
 from nltk.tokenize import sent_tokenize,word_tokenize
@@ -39,11 +41,16 @@ countError = 0
 countAllegation = 0
 countAppreciation = 0
 countCallForAction = 0
+countYes = 0
+countNo = 0
+
+LabeledSentence = gensim.models.doc2vec.LabeledSentence
 
 MONGO_HOST = "10.2.32.86"
 MONGO_PORT = 27017
 
 w2vTrained = None
+d2v = None
 
 X_train = []
 y_train = []
@@ -99,10 +106,14 @@ def cleanSentences(string):
     return re.sub(strip_special_chars, "", string.lower())
 
 
-def makeDataSet():
+def makeDataSet(labell):
 	client = MongoClient(MONGO_HOST, MONGO_PORT)
 	database = client["synopsis"]
 	sessions = database["sessions"]
+	global countYes
+	global countNo
+	countYes = 0
+	countNo = 0
 	global countFor
 	global countAgainst
 	global countDefect
@@ -129,31 +140,18 @@ def makeDataSet():
 									data["stance"] = debateBill[speech]["stance"]
 									data["speech"] = debateBill[speech]["speech"]
 									data["name"] = debateBill[speech]["name"]
-									#newlinespeech = cleanSentences(data["speech"])
-									if "Defect" in data["stance"]:
-										f = open("defect/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countDefect = countDefect + 1
-									if "Allegation" in data["stance"]:
-										f = open("allegation/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countAllegation = countAllegation + 1
-									if "Appreciation" in data["stance"]:
-										f = open("appreciation/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countAppreciation = countAppreciation + 1
-									if "CallForAction" in data["stance"]:
-										f = open("callforaction/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countCallForAction = countCallForAction + 1
-									if "for" in data["stance"]:
-										f = open("for/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countFor = countFor + 1
-									if "against" in data["stance"]:
-										f = open("against/" + str(debateId) + "_" + str(speech),"w+")
-										f.write(data["speech"].encode('utf-8'))
-										countAgainst = countAgainst + 1
+									newlinespeech = cleanSentences(data["speech"])
+									if labell in data["stance"]:
+										f = open("yes/" + str(debateId) + "_" + str(speech),"w+")
+										countYes = countYes + 1
+										f.write(newlinespeech.encode('utf-8'))
+										f.close()
+									else:
+										if data["stance"] != "":
+											f = open("no/" + str(debateId) + "_" + str(speech),"w+")
+											countNo = countNo + 1
+											f.write(newlinespeech.encode('utf-8'))
+											f.close()
 				if debate == "5999646837335cad52ecd865" or debate == "59dce640a7401a6088699006" or debate == "5999643037335cad52ecd85e": # Calling Attention and Discussions related
 						for bill in session["debates"][debate]:
 							debateId = bill
@@ -171,30 +169,18 @@ def makeDataSet():
 												data["stance"] = debateBill[speech][en]["stance"]
 												data["speech"] = debateBill[speech][en]["speech"]
 												data["name"] = debateBill[speech][en]["name"]
-												if "Defect" in data["stance"]:
-													f = open("defect/" + str(debateId) + "_" + str(en),"w+")
+												newlinespeech = cleanSentences(data["speech"])
+												if labell in data["stance"]:
+													f = open("yes/" + str(debateId) + "_" + str(en),"w+")
+													countYes = countYes + 1
 													f.write(data["speech"].encode('utf-8'))
-													countDefect = countDefect + 1
-												if "Allegation" in data["stance"]:
-													f = open("allegation/" + str(debateId) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAllegation = countAllegation + 1
-												if "Appreciation" in data["stance"]:
-													f = open("appreciation/" + str(debateId) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAppreciation = countAppreciation + 1
-												if "CallForAction" in data["stance"]:
-													f = open("callforaction/" + str(debateId) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countCallForAction = countCallForAction + 1
-												if "for" in data["stance"]:
-													f = open("for/" + str(debateId) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countFor = countFor + 1
-												if "against" in data["stance"]:
-													f = open("against/" + str(debateId) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAgainst = countAgainst + 1
+													f.close()
+												else:
+													if data["stance"] != "":
+														f = open("no/" + str(debateId) + "_" + str(en),"w+")
+														countNo = countNo + 1
+														f.write(newlinespeech.encode('utf-8'))
+														f.close()
 				if debate == "5999649f37335cad52ecd86b": # Government Bills
 						for bill in session["debates"][debate]:
 							
@@ -221,31 +207,17 @@ def makeDataSet():
 										data["speech"] = debateBill[speech]["speech"]
 										data["name"] = debateBill[speech]["name"]
 										newlinespeech = cleanSentences(data["speech"])
-										newline = ""
-										if "Defect" in data["stance"]:
-											f = open("defect/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countDefect = countDefect + 1
-										if "Allegation" in data["stance"]:
-											f = open("allegation/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countAllegation = countAllegation + 1
-										if "Appreciation" in data["stance"]:
-											f = open("appreciation/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countAppreciation = countAppreciation + 1
-										if "CallForAction" in data["stance"]:
-											f = open("callforaction/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countCallForAction = countCallForAction + 1
-										if "for" in data["stance"]:
-											f = open("for/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countFor = countFor + 1
-										if "against" in data["stance"]:
-											f = open("against/" + str(bill) + "_" + str(speech),"w+")
-											f.write(data["speech"].encode('utf-8'))
-											countAgainst = countAgainst + 1
+										if labell in data["stance"]:
+											f = open("yes/" + str(bill) + "_" + str(speech),"w+")
+											countYes = countYes + 1
+											f.write(newlinespeech.encode('utf-8'))
+											f.close()
+										else:
+											if data["stance"] != "":
+												f = open("no/" + str(bill) + "_" + str(speech),"w+")
+												countNo = countNo + 1
+												f.write(newlinespeech.encode('utf-8'))
+												f.close()
 				if debate == "599965fa37335cad52ecd88f": # Statutory Resolutions
 						for bill in session["debates"][debate]:
 		
@@ -267,32 +239,17 @@ def makeDataSet():
 											data["speech"] = debateBill[speech][en]["speech"]
 											data["name"] = debateBill[speech][en]["name"]
 											newlinespeech = cleanSentences(data["speech"])
-											newline = ""
-											found = False
-											if "Defect" in data["stance"]:
-												f = open("defect/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countDefect = countDefect + 1
-											if "Allegation" in data["stance"]:
-												f = open("allegation/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countAllegation = countAllegation + 1
-											if "Appreciation" in data["stance"]:
-												f = open("appreciation/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countAppreciation = countAppreciation + 1
-											if "CallForAction" in data["stance"]:
-												f = open("callforaction/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countCallForAction = countCallForAction + 1
-											if "for" in data["stance"]:
-												f = open("for/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countFor = countFor + 1
-											if "against" in data["stance"]:
-												f = open("against/" + str(bill) + "_" + str(speech),"w+")
-												f.write(data["speech"].encode('utf-8'))
-												countAgainst = countAgainst + 1
+											if labell in data["stance"]:
+												f = open("yes/" + str(debateId) + "_" + str(en),"w+")
+												countYes = countYes + 1
+												f.write(newlinespeech.encode('utf-8'))
+												f.close()
+											else:
+												if data["stance"] != "":
+													f = open("no/" + str(debateId) + "_" + str(en),"w+")
+													countNo = countNo + 1
+													f.write(newlinespeech.encode('utf-8'))
+													f.close()
 				if debate == "59d0d7f12589e39d8102872e" or debate == "5999659437335cad52ecd883" or debate == "5999660437335cad52ecd890": # Private Member Bill # Submission by members # Private Resoltion
 						for bill in session["debates"][debate]:
 							debateArray = session["debates"][debate][bill]
@@ -313,54 +270,34 @@ def makeDataSet():
 												data["speech"] = debateBill[speech][en]["speech"]
 												data["name"] = debateBill[speech][en]["name"]
 												newlinespeech = cleanSentences(data["speech"])
-												if "Defect" in data["stance"]:
-													f = open("defect/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countDefect = countDefect + 1
-												if "Allegation" in data["stance"]:
-													f = open("allegation/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAllegation = countAllegation + 1
-												if "Appreciation" in data["stance"]:
-													f = open("appreciation/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAppreciation = countAppreciation + 1
-												if "CallForAction" in data["stance"]:
-													f = open("callforaction/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countCallForAction = countCallForAction + 1
-												if "for" in data["stance"]:
-													f = open("for/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countFor = countFor + 1
-												if "against" in data["stance"]:
-													f = open("against/" + str(debateE) + "_" + str(en),"w+")
-													f.write(data["speech"].encode('utf-8'))
-													countAgainst = countAgainst + 1
+												if labell in data["stance"]:
+													f = open("yes/" + str(debateId) + "_" + str(en),"w+")
+													countYes = countYes + 1
+													f.write(newlinespeech.encode('utf-8'))
+													f.close()
+												else:
+													if data["stance"] != "":
+														f = open("no/" + str(debateId) + "_" + str(en),"w+")
+														countNo = countNo + 1
+														f.write(newlinespeech.encode('utf-8'))
+														f.close()
+												
 	f.close()
-	print "Count For " + str(countFor)
-	print "Count Against " + str(countAgainst)
-	print "Count Defect " + str(countDefect)
-	print "Count Allegation " + str(countAllegation)
-	print "Count Appreciation " + str(countAppreciation)
-	print "Count CallForAction " + str(countCallForAction)
+	print "Count Yes " + str(countYes)
+	print "Count No " + str(countNo)
 
-	print "Count Fake For " + str(countFor*5)
-	print "Count Fake Against " + str(countAgainst*5)
-	print "Count Fake Defect " + str(countDefect*5)
-	print "Count Fake Allegation " + str(countAllegation*5)
-	print "Count Fake Appreciation " + str(countAppreciation*5)
-	print "Count Fake CallForAction " + str(countCallForAction*5)
 
-def getFeatureVector(speech):
+def getFeatureVector(speech,fi):
 	# Google Word2Vec
-	'''speech = re.sub(' +',' ',speech)
+	speech = re.sub(' +',' ',speech)
 	words = speech.split()
 	google_vector = np.zeros(300, dtype='float64')
 	for word in words:
 		google_vector += get_word_vector(word)
 	if np.all(google_vector == 0): return None
-	return google_vector'''
+	return google_vector
+
+	'''
 
 	# Word2Vec trained
 
@@ -379,7 +316,13 @@ def getFeatureVector(speech):
 				w2vTrainedVector += zeros
 	return w2vTrainedVector
 
-	'''
+	# doc2vec trained
+
+	#global d2v 
+	#print d2v.docvecs[fi.split("/")[1]]
+	#return d2v.docvecs[fi.split("/")[1]]
+
+	
 	# Discourse Connectives
 	discourseConnectives = ['above all', 'accordingly', 'actually', 'admittedly','after', 'after', 'after all', 'after that', 'afterwards', 'again', 'all in all', 'all the same', 'also', 'alternatively', 'although', 'always assuming that', 'and', 'or', 'anyway', 'as', 'as a consequence', 'as a corollary', 'as a result', 'as long as', 'as soon as', 'as well', 'at any rate', 'at first', 'at first sight', 'at first blush', 'at first view', 'at the moment when', 'at the outset', 'at the same time', 'because', 'before', 'but', 'by comparison', 'by contrast', 'by the same token', 'by the way', 'certainly', 'clearly', 'consequently', 'conversely', 'correspondingly', 'despite that', 'despite the fact that', 'earlier', 'either', 'else', 'equally', 'essentially then', 'even', 'even so', 'even then', 'eventually', 'every time', 'except', 'except insofar', 'finally', 'first', 'first of all', 'firstly', 'for', 'for a start', 'for example', 'for instance', 'for one thing', 'for the simple reason', 'for this reason', 'further', 'furthermore','further', 'given that', 'hence', 'however', 'if', 'if ever', 'if not', 'if only', 'if so', 'in a different vein', 'in actual fact','in addition', 'in any case', 'in case', 'in conclusion', 'in contrast','in fact', 'initially', 'in other words', 'in particular', 'in short', 'in spite of that', 'in sum', 'in that case', 'in the beginning', 'in the case of X','in the end','in the first place','in the meantime','in this way', 'in turn', 'in as much as','incidentally','indeed','instead','it follows that','it might appear that','it might seem that', 'just as','last', 'lastly','later','let us assume','likewise','meanwhile', 'merely','merely because','moreXly','moreover','mostly','much later','much sooner','naturally','neither is it the same','nevertheless','next','no doubt','nonetheless','not','not because','not only','not that','notably','notwithstanding that','notwithstanding that','now','now that','obviously','of course','on condition that','one one hand','on one side','on the assumption that','on the contrary','on the grounds that', 'on the one hand','on the one side','on the other hand','on the other side','once','once again','once more','or','or else','otherwise','overall','plainly','presumbly because','previously','provided that','providing that','put another way','rather','reciprocally','regardless of that','simply because','secondly','still','so that','since','similarly','simultaneously','so','specifically','still','subsequently','summarising','suppose','supposing that','surely','sure enough','such that','summing up','surely','that is','that is to say','the fact is that','the more often','then','thereafter','then again','therefore','thirdly','this time','thereby','this time','thus','though','to be sure','to conclude','to sum up','to start with','to begin with','thus','to the degree that','too','ultimetly','unless','we might say','when','wherein','while','yet','whenever','wheras','what is more','until','undoubtedly','true']
 	discourse_vector = np.zeros(len(discourseConnectives), dtype='float64')
@@ -425,7 +368,7 @@ def makeFeatures():
 	for fi in CallforActionFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			vector = getFeatureVector(text)
+			vector = getFeatureVector(text,fi)
 			if np.all(vector == 0):
 				pass
 			else:
@@ -442,7 +385,7 @@ def makeFeatures():
 	for fi in DefectFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			vector = getFeatureVector(text)
+			vector = getFeatureVector(text,fi)
 			if np.all(vector == 0):
 				pass
 			else:
@@ -459,7 +402,7 @@ def makeFeatures():
 	for fi in AllegationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			vector = getFeatureVector(text)
+			vector = getFeatureVector(text,fi)
 			if np.all(vector == 0):
 				pass
 			else:
@@ -476,11 +419,86 @@ def makeFeatures():
 	for fi in AppreciationFiles:
 		with open(fi, "r") as f:
 			text=f.read()
-			vector = getFeatureVector(text)
+			vector = getFeatureVector(text,fi)
 			if np.all(vector == 0):
 				pass
 			else:
 				if count < (countAppreciation*(float(8)/10)):
+					X_train.append(vector)
+					y_train.append(1)
+				else:
+					X_test.append(vector)
+					y_test.append(1)
+				count = count + 1
+
+	X_train = np.array(X_train)
+	y_train = np.array(y_train)
+	X_test = np.array(X_test)
+	y_test = np.array(y_test)
+
+	print X_train.shape
+	print y_train.shape
+	print X_test.shape
+	print y_test.shape
+
+	with open("X_train.p", "wb") as f:
+		pickle.dump(X_train, f)
+
+	with open("y_train.p", "wb") as f:
+		pickle.dump(y_train, f)
+
+	with open("X_test.p", "wb") as f:
+		pickle.dump(X_test, f)
+
+	with open("y_test.p", "wb") as f:
+		pickle.dump(y_test, f)
+
+def makeFeaturesCustom():
+	global X_train
+	global X_test
+	global y_train
+	global y_test
+	X_train = []
+	X_test = []
+	y_train = []
+	y_test = []
+	global X
+	global y
+	X = []
+	y = []
+	global countYes
+	global countNo
+	print countYes
+	print countNo
+	yesFiles = ['yes/' + f for f in listdir('yes/')]
+	count = 0
+	for fi in yesFiles:
+		with open(fi, "r") as f:
+			text=f.read()
+			vector = getFeatureVector(text,fi)
+			if np.all(vector == 0):
+				pass
+			else:
+				if count < (countYes*(float(8)/10)):
+					X_train.append(vector)
+					y_train.append(0)
+				else:
+					X_test.append(vector)
+					y_test.append(0)
+				count = count + 1
+
+	print "Yes Files " + str(count)
+
+	count = 0
+	noFiles = ['no/' + f for f in listdir('no/')]
+	for fi in noFiles:
+		with open(fi, "r") as f:
+			text=f.read()
+			vector = getFeatureVector(text,fi)
+			if np.all(vector == 0):
+				pass
+			else:
+				if count < (countNo*(float(8)/10)):
 					X_train.append(vector)
 					y_train.append(1)
 				else:
@@ -536,7 +554,7 @@ def makeModels():
 	print y.shape
 
 	svmModel = OneVsRestClassifier(svm.LinearSVC())
-	svmModel.fit(X_train, y_train)
+	svmModel.fit(X, y)
 	with open("svmModel.p", "wb") as f:
 		pickle.dump(svmModel, f)
 
@@ -550,37 +568,17 @@ def makeResults():
 	svmModel = None
 	with open("svmModel.p", "rb") as f:
 		svmModel = pickle.load(f)
-	scores = cross_validation(X, y, svmModel, cv=5)
-	pretty_print_scores(scores)
-
-def cross_validation(data, target, classifier, cv=5):
-    """
-    Does a cross validation with the classifier
-    parameters:
-        - `data`: array-like, shape=[n_samples, n_features]
-            Training vectors
-        - `target`: array-like, shape=[n_samples]
-            Target values for corresponding training vectors
-        - `classifier`: A classifier from the scikit-learn family would work!
-        - `cv`: number of times to do the cross validation. (default=5)
-    return a list of numbers, where the length of the list is equal to `cv` argument.
-    """
-    return sklearn.cross_validation.cross_val_score(classifier, data, target, cv=cv)
-
-
-def pretty_print_scores(scores):
-    """
-    Prints mean and std of a list of scores, pretty and colorful!
-    parameter `scores` is a list of numbers.
-    """
-    print colored("                                      ", 'white', 'on_white')
-    print colored(" Mean accuracy: %0.3f (+/- %0.3f std) " % (scores.mean(), scores.std() / 2), 'magenta', 'on_white', attrs=['bold'])
-    print colored("                                      ", 'white', 'on_white')
+	svmModel.fit(X_train, y_train)
+	predicted = svmModel.predict(X_test)
+	scores = cross_val_score(svmModel, X, y, cv=5)
+	print scores
+	print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+	print accuracy_score(y_test, predicted)
 
 def trainWord2Vec():
 	words = []
-	CallforActionFiles = ['callforaction/' + f for f in listdir('callforaction/')]
-	for fi in CallforActionFiles:
+	allFiles = ['yes/' + f for f in listdir('yes/')]
+	for fi in allFiles:
 		with open(fi, "r") as f:
 			text=f.read()
 			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
@@ -593,8 +591,8 @@ def trainWord2Vec():
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
-	DefectFiles = ['defect/' + f for f in listdir('defect/')]
-	for fi in DefectFiles:
+	allFiles = ['no/' + f for f in listdir('no/')]
+	for fi in allFiles:
 		with open(fi, "r") as f:
 			text=f.read()
 			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
@@ -607,44 +605,84 @@ def trainWord2Vec():
 					newWordsList.append(StemmingHelper.stem(wor))
 				words.append(newWordsList)
 
-	AllegationFiles = ['allegation/' + f for f in listdir('allegation/')]
-	for fi in AllegationFiles:
-		with open(fi, "r") as f:
-			text=f.read()
-			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
-			for sent in sentenceList:
-				wordsList = word_tokenize(sent)
-				newWordsList = []
-				for wor in wordsList:
-					exclude = set(string.punctuation)
-					wor = ''.join(ch for ch in wor if ch not in exclude)
-					newWordsList.append(StemmingHelper.stem(wor))
-				words.append(newWordsList)
-
-	AppreciationFiles = ['appreciation/' + f for f in listdir('appreciation/')]
-	for fi in AppreciationFiles:
-		with open(fi, "r") as f:
-			text=f.read()
-			sentenceList = sent_tokenize(text.decode('utf-8').strip().lower())
-			for sent in sentenceList:
-				wordsList = word_tokenize(sent)
-				newWordsList = []
-				for wor in wordsList:
-					exclude = set(string.punctuation)
-					wor = ''.join(ch for ch in wor if ch not in exclude)
-					newWordsList.append(StemmingHelper.stem(wor))
-				words.append(newWordsList)
-
-	print len(words)
 	model = gensim.models.Word2Vec(words, min_count=2,window = 5, workers=12,size=100)
 	model.save('word2vec')
 	words = list(model.wv.vocab)
 	return model
 
+
+class LabeledLineSentence(object):
+    def __init__(self, doc_list, labels_list):
+       self.labels_list = labels_list
+       self.doc_list = doc_list
+    def __iter__(self):
+        for idx, doc in enumerate(self.doc_list):
+        	yield LabeledSentence(words=doc.split(),tags=[self.labels_list[idx]])
+
+def trainDoc2Vec():
+	docLabels = []
+	docLabels = [f for f in listdir("all/")]
+	data = []
+	for doc in docLabels:
+		f = open("all/" + doc, "r")
+		data.append(f.read())
+		f.close()
+		
+	it = LabeledLineSentence(data, docLabels)
+
+	model = gensim.models.Doc2Vec(size=300, workers=6,) # use fixed learning rate
+	model.build_vocab(it)
+	model.train(it,total_examples=len(docLabels), epochs=100)
+	model.save('/tmp/my_model.doc2vec')
+	return model
+
 if __name__ == "__main__":
-	makeDataSet()
+	global d2v
 	global w2vTrained
-	w2vTrained = trainWord2Vec()
-	makeFeatures()
+	global X_train
+	global X_test
+	global y_test
+	global y_train
+	global X
+	global Y 
+	#makeDataSetCustom("CallForAction")
+	#d2v = trainDoc2Vec()
+	print "For"
+	makeDataSet("for")
+	w2vTrained = trainWord2Vec()	
+	makeFeaturesCustom()
 	makeModels()
 	makeResults()
+	os.system("rm -r yes/* no/*")
+	print "Against"
+	makeDataSet("against")
+	w2vTrained = trainWord2Vec()	
+	makeFeaturesCustom()
+	makeModels()
+	makeResults()
+	os.system("rm -r yes/* no/*")
+	print "CallForAction"
+	makeDataSet("CallForAction")
+	w2vTrained = trainWord2Vec()	
+	makeFeaturesCustom()
+	makeModels()
+	makeResults()
+	os.system("rm -r yes/* no/*")
+	print "Defect"
+	makeDataSet("Defect")
+	makeFeaturesCustom()
+	makeModels()
+	makeResults()
+	os.system("rm -r yes/* no/*")
+	print "Allegation"
+	makeDataSet("Allegation")
+	makeFeaturesCustom()
+	makeModels()
+	makeResults()
+	os.system("rm -r yes/* no/*")
+	print "Appreciation"
+	makeDataSet("Appreciation")
+	makeFeaturesCustom()
+	makeModels()
+	makeResults()
+	os.system("rm -r yes/* no/*")
